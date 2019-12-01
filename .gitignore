@@ -1,0 +1,14 @@
+# Ignore compiled js
+compiled/
+
+# Optional npm cache
+.npm
+
+# I USE MACOS BTW
+.DS_Store
+
+# Dependency directories
+node_modules/
+
+# just making sure
+.git/
