@@ -1,17 +1,11 @@
+import { readFileSync } from "fs";
+
 export class Groupe {
     
-    année : Number;
-    groupe: string;
+    private année : Number;
+    private groupe: string;
 
-    static codes: Object = {
-        "3": {
-            "A": "g8691",
-            "B": "g8694",
-            "C": "g8697",
-            "D": "g8700",
-            "E": "g8703"
-        }
-    };
+    private static codes: Object = JSON.parse(readFileSync("codeGroupes.json").toString());
 
     constructor(année: Number, groupe: string) {
         this.année = année;

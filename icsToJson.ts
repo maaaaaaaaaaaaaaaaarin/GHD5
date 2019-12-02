@@ -1,4 +1,7 @@
-import { Cours, TypeCours } from "./Cours"
+import { 
+    Cours,
+    TypeCours
+} from ".";
 
 export class icsToJson {
     

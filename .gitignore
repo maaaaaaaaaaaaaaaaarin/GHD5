@@ -12,3 +12,6 @@ node_modules/
 
 # just making sure
 .git/
+
+# lol
+package-lock.json

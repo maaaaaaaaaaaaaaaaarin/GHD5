@@ -1,9 +1,12 @@
 import request = require("request");
 import fs      = require("fs");
-import { icsToJson } from "./icsToJson";
-import { Groupe } from "./Groupe";
-import { Cours } from "./Cours";
-import { Logger } from "./Logger";
+import {
+    Logger,
+    icsToJson,
+    Groupe,
+    Cours
+} from ".";
+
 export class EmploisDuTemps {
 
     private contenu    : Cours[];
