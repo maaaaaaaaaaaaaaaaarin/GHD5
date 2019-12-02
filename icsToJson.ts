@@ -77,6 +77,3 @@ export class icsToJson {
     }
 
 }
-
-//module.exports = convert;
-//export default convert;

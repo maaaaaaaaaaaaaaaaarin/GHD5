@@ -6,9 +6,9 @@ import 'mocha';
 
 let gp         : Groupe;
 let test_groupe: string;
-let test_année : Number;
+let test_année : number;
 
-let codes: Object = JSON.parse(readFileSync("codeGroupes.json").toString());
+let codes: JSON = JSON.parse(readFileSync("codeGroupes.json").toString());
 
 before(() => {
   test_groupe = "D";
@@ -41,10 +41,7 @@ describe('Groupe: Getters', () => {
 describe("Groupe: Static Methods", () => {
   describe("getCode()", () => {
     it("Should return a [Groupe]'s code as seen on the planning website.", () => {
-      expect(Groupe.getCode(test_année, test_groupe)).to.equal(codes[<string><unknown>test_année][test_groupe]);
+      expect(Groupe.getCode(test_année, test_groupe)).to.equal(codes[test_année.toString()][test_groupe]);
     });
   });
-  // describe("getCodes()", () => {
-  //   it("Should return a [Groupe]'s <codes> attribute")
-  // });
 });

@@ -5,8 +5,8 @@ export enum TypeCours {
 export interface Cours {
     start  : number[][];
     end    : number[][];
-    salle  : String;
+    salle  : string;
     type   : TypeCours;
-    prof   : String;
-    matière: String;
+    prof   : string;
+    matière: string;
 }

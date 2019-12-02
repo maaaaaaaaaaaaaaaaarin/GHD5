@@ -22,7 +22,7 @@ export class EmploisDuTemps {
     constructor(groupe: Groupe, callback?: Function) {
         
         let codes: Object    = Groupe.getCodes();
-        let année: string    = <string><unknown>groupe.getAnnée();
+        let année: string    = groupe.getAnnée().toString();
         let lettre: string   = groupe.getGroupe();
         let filename: string = `${codes[année][lettre]}`;
         let jsonfile: string = `${filename}${EmploisDuTemps.fext["json"]}`;
@@ -50,7 +50,7 @@ export class EmploisDuTemps {
                 // Traitement de l'erreur par Logger
                 if (err) Logger.error(err); 
 
-                this.contenu  = JSON.parse(<string><unknown>data);
+                this.contenu  = JSON.parse(data.toString());
                 this.initdone = true;
                 
                 Logger.info(`EDT du Groupe S${année}${lettre} chargé.`);
