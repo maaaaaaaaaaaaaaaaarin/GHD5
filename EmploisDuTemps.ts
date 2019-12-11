@@ -10,7 +10,6 @@ import {
 export class EmploisDuTemps {
 
     private contenu    : Cours[] = [];
-    private initdone   : boolean = false;
     static  forceUpdate: boolean = false;
     static  baseURI    : string  =
     "https://edt.iut-tlse3.fr/planning/info/";
@@ -19,35 +18,56 @@ export class EmploisDuTemps {
         "ics" : ".ics"
     }
 
+    private groupe : Groupe;
+
     /**
      * Charge, ou télécharge l'emplois du temps correspondant au groupe passé
      * @param groupe Groupe ciblé par l'emplois du temps
      */
     constructor(groupe: Groupe, callback?: Function) {
+        this.groupe = groupe;
+        this.updateContenu();
+    }
+
+    /**
+     * Mets à jour la valeur de l'attribut `contenu`
+     * Le fichier associé au contenu d'un groupe donné est altéré si:
+     * - forceUpdate = true
+     * - le fichier n'existe pas au préalable  
+     * `callback` reçoit un `string` en paramètre:    
+     * - 'maj' si le fichier a été re-téléchargé
+     * - 'crt' si le fichier a été crée (init)
+     * - 'load' si le fichier a été chargé
+     * @param callback<string>
+     */
+    public updateContenu(callback?:Function): void {
         
         let codes: any       = Groupe.getCodes();
-        let année: string    = groupe.getAnnée().toString();
-        let lettre: string   = groupe.getGroupe();
+        let année: string    = this.groupe.getAnnée().toString();
+        let lettre: string   = this.groupe.getGroupe();
         let filename: string = `${codes[année][lettre]}`;
         let jsonfile: string = `${filename}${EmploisDuTemps.fext["json"]}`;
         let icsfile: string  = `${filename}${EmploisDuTemps.fext["ics"]}`;
+        let cbstr: string = "";
 
-        // Si le fichier JSON n'existe pas, ou si une màj est forcée;
         if (!fs.existsSync(jsonfile) || EmploisDuTemps.forceUpdate) {
-            Logger.info(`Le fichier ${jsonfile} n'existe pas, création. (groupe: ${groupe})`);
+            Logger.info(`Le fichier ${jsonfile} n'existe pas, création. (groupe: ${this.groupe})`);
             // The More You Know: URI signifie Uniform Resource Identifier;
             let targetURI: string = `${EmploisDuTemps.baseURI}${icsfile}`;
             request.get(targetURI, (err, res, body) => {
                 // Traitement de l'erreur par Logger
                 if (err) Logger.error(err);
-
                 let converted: icsToJson = new icsToJson(res.body);
                 console.log(converted.getJSON());
                 let jsonStr: string  = JSON.stringify(converted.getJSON());
                 console.log(jsonStr)
                 fs.writeFileSync(__dirname + '/' + jsonfile, jsonStr);
             });
+            
+            if (EmploisDuTemps.forceUpdate) cbstr="màj";
+            if (!fs.existsSync(jsonfile)) cbstr="crt";
         }
+        
         if (fs.existsSync(jsonfile)) {
             fs.readFile(jsonfile, (err, data) => {
                 
@@ -55,16 +75,16 @@ export class EmploisDuTemps {
                 if (err) Logger.error(err); 
 
                 this.contenu  = JSON.parse(data.toString());
-                this.initdone = true;
                 
                 Logger.info(`EDT du Groupe S${année}${lettre} chargé.`);
-
+                cbstr="load";
             })
         }
+        if (callback) callback(cbstr);
     }
 
     /**
-     * Force une mise à jour du fichier JSON du groupe concerné
+     * Force une mise à jour du fichier JSON du groupe concerné  
      * peu importe si le fichier existe déjà ou non
      * @param bool 
      */
@@ -80,7 +100,7 @@ export class EmploisDuTemps {
     }
 
     /**
-     * Logique permettant de 'naviguer' l'emploi du temps d'heure en heure,
+     * Logique permettant de 'naviguer' l'emploi du temps d'heure en heure,  
      * et de jour en jour, navigation bi-directionelle pour une date donnée.
      * @param date Date donnée
      * @param operator + ou -
@@ -138,8 +158,9 @@ export class EmploisDuTemps {
 
 
     /**
-     * Renvoie le cours suivant relatif à une date donnée
-     * Si 
+     * Renvoie le cours suivant relatif à une date donnée  
+     * Si l'heure dépasse l'heure maximale à laquelle un cours peut avoir lieu  
+     * on cherche sur le jour suivant, même chose pour les weekends.  
      * @param date Date de référence
      */    
     public getCoursSuivant(date: Date = new Date()): Cours {
@@ -161,6 +182,13 @@ export class EmploisDuTemps {
         return cours;
     }
 
+
+    /**
+     * Renvoie le cours précédent relatif à une date donnée  
+     * Si l'heure dépasse l'heure maximale à laquelle un cours peut avoir lieu  
+     * on cherche sur le jour suivant, même chose pour les weekends.  
+     * @param date Date de référence
+     */  
     public getCoursPrécédent(date: Date = new Date()): Cours {
 
         let cours: Cours = this.getCoursAt(date);

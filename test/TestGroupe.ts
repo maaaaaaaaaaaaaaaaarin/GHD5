@@ -8,7 +8,7 @@ let gp         : Groupe;
 let test_groupe: string;
 let test_année : number;
 
-let codes: JSON = JSON.parse(readFileSync("codeGroupes.json").toString());
+let codes: any = JSON.parse(readFileSync("codeGroupes.json").toString());
 
 before(() => {
   test_groupe = "D";
@@ -17,7 +17,7 @@ before(() => {
 });
 
 after(() => {
-  gp = null;
+  gp = <Groupe>{};
 });
 
 describe('Groupe: Getters', () => {
