@@ -9,19 +9,23 @@ import {
 
 export class EmploisDuTemps {
 
-    private contenu    : Cours[];
+    private contenu    : Cours[] = [];
     private initdone   : boolean = false;
     static  forceUpdate: boolean = false;
     static  baseURI    : string  =
     "https://edt.iut-tlse3.fr/planning/info/";
-    static fext: Object          = {
+    static fext: any = {
         "json": ".json",
         "ics" : ".ics"
     }
 
+    /**
+     * Charge, ou télécharge l'emplois du temps correspondant au groupe passé
+     * @param groupe Groupe ciblé par l'emplois du temps
+     */
     constructor(groupe: Groupe, callback?: Function) {
         
-        let codes: Object    = Groupe.getCodes();
+        let codes: any       = Groupe.getCodes();
         let année: string    = groupe.getAnnée().toString();
         let lettre: string   = groupe.getGroupe();
         let filename: string = `${codes[année][lettre]}`;
@@ -55,19 +59,32 @@ export class EmploisDuTemps {
                 
                 Logger.info(`EDT du Groupe S${année}${lettre} chargé.`);
 
-                if (callback) callback();
             })
         }
     }
-    
+
+    /**
+     * Force une mise à jour du fichier JSON du groupe concerné
+     * peu importe si le fichier existe déjà ou non
+     * @param bool 
+     */
     static setForceUpdate(bool: boolean): void {
         this.forceUpdate = bool;
     }
     
+    /**
+     * Renvoie l'URI de base
+     */
     static getBaseURI(): string {
         return this.baseURI;
     }
 
+    /**
+     * Logique permettant de 'naviguer' l'emploi du temps d'heure en heure,
+     * et de jour en jour, navigation bi-directionelle pour une date donnée.
+     * @param date Date donnée
+     * @param operator + ou -
+     */
     private getCoursSharedLogic(date: Date, operator: string): void {
         // Si l'opérateur est -, l'heure ciblée est 18:30, autrement, 8:00
         let [h,m]: number[] = operator=='-'?[18,30]:[8,0];
@@ -80,10 +97,17 @@ export class EmploisDuTemps {
         }
     }
 
+    /**
+     * Renvoie la liste de `Cours`
+     */
     public getContenu(): Cours[] {
         return this.contenu;
     }
 
+    /**
+     * Renvoie un cours situé à une date donnée
+     * @param date Date de référence
+     */
     public getCoursAt(date: Date): Cours {
         let aTargetDate: Number[] = [
             date.getFullYear(),
@@ -97,9 +121,7 @@ export class EmploisDuTemps {
         ];
 
         let sTargetDate: string = aTargetDate.toString();
-        let coursAt: Cours      = null;
-
-        //console.log(this.getContenu());
+        let coursAt: Cours = <Cours>{};
 
         this.getContenu().forEach(cours => {
             let conditions_etre_dans_cours: boolean[] = [
@@ -114,6 +136,12 @@ export class EmploisDuTemps {
         return coursAt;
     }
 
+
+    /**
+     * Renvoie le cours suivant relatif à une date donnée
+     * Si 
+     * @param date Date de référence
+     */    
     public getCoursSuivant(date: Date = new Date()): Cours {
         
         let cours: Cours = this.getCoursAt(date);

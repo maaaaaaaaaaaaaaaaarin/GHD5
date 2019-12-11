@@ -65,7 +65,7 @@ export class icsToJson {
                 } else if (entete == this.SUMMARY ) {
                     let [type, matière] = value.split('-').map(x => x.trim());
                     currentObj["matière"] = matière.split("\\")[0];
-                    currentObj["type"] = TypeCours[type];
+                    currentObj["type"] = <TypeCours><unknown>TypeCours[<any>type];
                 } else if (entete == this.DESCRIPTION ) {
                     let prof = element.split("\\")[1].split(":")[1].trim();
                     currentObj["prof"] = prof;

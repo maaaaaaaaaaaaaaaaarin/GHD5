@@ -5,7 +5,7 @@ export class Groupe {
     private année : number;
     private groupe: string;
 
-    private static codes: Object = JSON.parse(readFileSync("codeGroupes.json").toString());
+    private static codes = JSON.parse(readFileSync("codeGroupes.json").toString());
 
     constructor(année: number, groupe: string) {
         this.année = année;
@@ -14,7 +14,7 @@ export class Groupe {
     }
 
     static getCode(année: number, groupe: string): string {
-        return this.codes[année.toString()][groupe];
+        return this.codes[`${année}`][groupe];
     }
 
     static getCodes(): Object {
