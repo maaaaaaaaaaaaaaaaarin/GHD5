@@ -214,7 +214,7 @@ export class EmploisDuTemps {
 
         let targetDate: Date = new Date();
         if (Object.keys(details).indexOf("date") > -1) {
-            targetDate = 
+            return; // to be implemented
         }
         while (tries > 0 && !found) {
 
