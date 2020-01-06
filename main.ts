@@ -149,7 +149,7 @@ let cas = [
 
         if (!request==undefined) response.send("Invalid Request");
 
-        let data = request.body;
+        let data = request.body.queryResult.parameters;
 
         console.log(data)
 
