@@ -151,9 +151,10 @@ let cas = [
 
         let data = request.body;
 
+        console.log(data)
+
         switch (data.question) {
             case "premier-cours":
-
                 let edt: any = EDTs.get(data.groupe);
                 let date: Date = new Date();
                 if (data["date-time"] != "" && data["date-time"] != null) {
