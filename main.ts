@@ -5,13 +5,43 @@ import {
 
 import express, {Application, json}  from 'express';
 import { format } from "path";
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
 
 const app : Application = express();
 let   main: Function;
-let   port: number = 80;
+let   http_port: number = 80;
+let   https_port: number = 443;
+
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/ghcc.xyz/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/ghcc.xyz/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/ghcc.xyz/chain.pem', 'utf8');
+
+const credentials = {
+        key: privateKey,
+        cert: certificate,
+        ca: ca
+};
+
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
+
 
 app.use(express.json());
 
+// Certification let's encrypt
+app.get('/.well-known/acme-challenge/*', express.static(__dirname + '/.well-known/acme-challenge/a-string'));
+
+app.get('/', (req, res) => { 
+        res.charset = 'utf-8';
+        res.send("WELCOME TO UGANDA<br/>Page demandée: "+req.url);
+})
+
+app.get('/test', (req,res) => {
+        res.charset = 'utf-8';
+        res.send("Who killed Captain Alex???");
+})
 
 const SEMESTRE = function(semestre: number): any[][] {
     let out: any[][] = [];
@@ -107,19 +137,6 @@ let cas = [
 
         let data = request.body;
 
-        // // On suppose que les fields sont exposés directement:
-
-        // let exampledata = {
-        //     "date":new Date(),
-        //     "commence_termine":0,
-        //     "groupe":"S3D"
-        // }
-
-
-        // let cfp : any = checkFieldPresence(data);
-
-        // if (cfp.length==0) return;
-
         switch (data.question) {
             case "premier-cours":
 
@@ -140,28 +157,16 @@ let cas = [
             default:
                 break;
         }
-
-
-        // let presence: any = {};
-        // Object.keys(data).forEach(field => {
-        //     presence[field] = data[field]==null?false:true;
-        // })
-
-        // let i: number = 1;
-        // cas.forEach(c => {
-        //     if (format(c) == format(presence)) {
-        //         console.log("request elements match n°"+i);
-        //     }
-        //     i++;
-        // })
-
     });
 
-    app.listen(port, () => {
+    httpServer.listen(http_port, () => {
         console.log(`
-            
-            Listening on port ${port} ...
-
+        HTTP: Listening on poart ${http_port}
         `);
-    })
+    });
+    httpsServer.listen(https_port, () => {
+        console.log(`
+        HTTP: Listening on poart ${https_port}
+        `);
+    });
 })();
