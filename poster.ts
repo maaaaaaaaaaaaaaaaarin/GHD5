@@ -5,7 +5,7 @@ const req = {
     method:'POST',
     json: {
         "hello":"world",
-        "1+1":2,
+        "world":2,
     }
 }
 

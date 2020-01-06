@@ -200,4 +200,28 @@ export class EmploisDuTemps {
         return cours;
     }
 
+    public getTrousSuivant() {
+        return;
+    }
+
+    public getTrousPrécédent() {
+        return;
+    }
+
+    public complexSearch(...details: Array< Map<string, any> >) {
+        let tries: number = 100;
+        let found: boolean = false;
+
+        let targetDate: Date = new Date();
+        if (Object.keys(details).indexOf("date") > -1) {
+            targetDate = 
+        }
+        while (tries > 0 && !found) {
+
+        }
+        for (let detail in details) {
+
+        }
+    }
+
 }
