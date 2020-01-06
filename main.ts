@@ -27,6 +27,20 @@ const credentials = {
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 
+const returnMessage = {
+    "fulfillmentText":"response",
+    "fulfillmentMessages":[
+        {
+            "text": {
+                "text": [
+                    "lol :)"
+                ]
+            }
+        }
+    ],
+    "source":""
+}
+
 
 app.use(express.json());
 
@@ -143,7 +157,6 @@ let cas = [
                 let edt: any = EDTs.get(data.groupe);
                 let date: Date = new Date();
                 if (data["date-time"] != "" && data["date-time"] != null) {
-                    console.log("hi")
                     date = new Date(data["date-time"]);
                 }
 
@@ -151,7 +164,8 @@ let cas = [
                 date.setMinutes(0);
 
                 let coursSuivant = edt.getCoursSuivant(date);
-                response.send(JSON.stringify(coursSuivant));
+                response.send(JSON.stringify(returnMessage));
+                //response.send(JSON.stringify(coursSuivant));
                 break;
 
             default:
