@@ -172,7 +172,7 @@ let cas = [
 
                 let coursSuivant = edt.getCoursSuivant(date);
                 let returnString: string = "";
-                returnString += `Vous commencez à ${coursSuivant.start[1][0]}h${coursSuivant.start[1][1]} ${jours[date.getDay()-1]}`;
+                returnString += `Vous commencez à ${coursSuivant.start[1][0]}h${coursSuivant.start[1][1]} le ${jours[date.getDay()-1]} ${jours[date.getDate()]}`;
                 returnMessage.fulfillmentMessages[0].text.text[0] = returnString;
                 response.send(JSON.stringify(returnMessage));
                 //response.send(JSON.stringify(coursSuivant));
