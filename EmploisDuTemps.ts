@@ -173,21 +173,9 @@ export class EmploisDuTemps {
     public getCoursSuivant(date: Date = new Date()): Cours {
         
         let cours: Cours = this.getCoursAt(date);
-        console.log("Date initiale:");
-        console.log(date);
         do {
             this.getCoursSharedLogic(date, '+');
             cours = this.getCoursAt(date);
-            console.log(date);
-            console.log(cours);
-            /*date.setHours(date.getHours()+1);
-            date.setMinutes(date.getMinutes()+30);
-            let fTime: string = `${date.getHours()}${date.getMinutes()}`;
-            if (Number(fTime) >= 1830) {
-                date.setDate(date.getDate()+1);
-                date.setHours(8);
-                date.setMinutes(0);
-            }*/
         } while(Object.keys(cours).length == 0); // Tant que la valeur renvoyée est `null`;
         return cours;
     }
@@ -205,7 +193,8 @@ export class EmploisDuTemps {
 
         do {
             this.getCoursSharedLogic(date, '-');
-        } while(!cours); // Tant que la valeur renvoyée est `null`;
+            cours = this.getCoursAt(date);
+        } while(Object.keys(cours).length == 0); // Tant que la valeur renvoyée est `null`;
 
         return cours;
     }
