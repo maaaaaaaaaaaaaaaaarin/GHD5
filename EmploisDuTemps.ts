@@ -144,13 +144,20 @@ export class EmploisDuTemps {
         let coursAt: Cours = <Cours>{};
 
         this.getContenu().forEach(cours => {
+            
+            // indices
+            let iHeures = 0;
+            let iTemps  = 1;
+            let iMinutes = 1;
+
             let conditions_etre_dans_cours: boolean[] = [
-                (aTargetTime[0] == cours.start[1][0] && aTargetTime[1] >= cours.start[1][1]),
-                (aTargetTime[0] == cours.end[1][0]   && aTargetTime[1] <  cours.end[1][1]),
-                (aTargetTime[0] >  cours.start[1][0] && aTargetTime[0] <  cours.end[1][0])
+                (aTargetTime[iHeures] == cours.start[iTemps][iHeures] && aTargetTime[iMinutes] >= cours.start[iTemps][iMinutes]),
+                (aTargetTime[iHeures] == cours.end[iTemps][iHeures]   && aTargetTime[iMinutes] <  cours.end[iTemps][iMinutes]),
+                (aTargetTime[iHeures] >  cours.start[iTemps][iHeures] && aTargetTime[iHeures] <  cours.end[iTemps][iHeures])
             ];
             if (conditions_etre_dans_cours.some(x=>x)) {
-                coursAt = cours;
+                if ((aTargetDate[0] == cours.start[0][0] && aTargetDate[1] == cours.start[0][1] && aTargetDate[2] == cours.start[0][2]))
+                    coursAt = cours;
             }
         })
         return coursAt;
@@ -166,9 +173,13 @@ export class EmploisDuTemps {
     public getCoursSuivant(date: Date = new Date()): Cours {
         
         let cours: Cours = this.getCoursAt(date);
-
+        console.log("Date initiale:");
+        console.log(date);
         do {
             this.getCoursSharedLogic(date, '+');
+            cours = this.getCoursAt(date);
+            console.log(date);
+            console.log(cours);
             /*date.setHours(date.getHours()+1);
             date.setMinutes(date.getMinutes()+30);
             let fTime: string = `${date.getHours()}${date.getMinutes()}`;
@@ -177,8 +188,7 @@ export class EmploisDuTemps {
                 date.setHours(8);
                 date.setMinutes(0);
             }*/
-        } while(!cours); // Tant que la valeur renvoyée est `null`;
-
+        } while(Object.keys(cours).length == 0); // Tant que la valeur renvoyée est `null`;
         return cours;
     }
 
@@ -202,6 +212,10 @@ export class EmploisDuTemps {
 
     public getTrousSuivant() {
         return;
+    }
+
+    public toString() {
+        return `Emplois du temps du groupe ${this.groupe.toString()}: ${this.contenu.length} éléments`;
     }
 
     public getTrousPrécédent() {
