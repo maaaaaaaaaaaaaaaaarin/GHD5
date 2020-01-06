@@ -24,6 +24,12 @@ const credentials = {
         ca: ca
 };
 
+const jours = [
+    "lundi","mardi","mercredi",
+    "jeudi","vendredi","samedi",
+    "dimanche"
+]
+
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 
@@ -151,7 +157,7 @@ let cas = [
 
         let data = request.body.queryResult.parameters;
 
-        console.log(data)
+        console.log(request.body)
 
         switch (data.question) {
             case "premier-cours":
@@ -166,12 +172,13 @@ let cas = [
 
                 let coursSuivant = edt.getCoursSuivant(date);
                 let returnString: string = "";
-                returnString += `Vous commencez à ${coursSuivant.start[1][0]}h${coursSuivant.start[1][1]} demain.`;
+                returnString += `Vous commencez à ${coursSuivant.start[1][0]}h${coursSuivant.start[1][1]} ${jours[date.getDay()]}`;
                 returnMessage.fulfillmentMessages[0].text.text[0] = returnString;
                 response.send(JSON.stringify(returnMessage));
                 //response.send(JSON.stringify(coursSuivant));
                 break;
-
+            
+            
             default:
                 break;
         }
