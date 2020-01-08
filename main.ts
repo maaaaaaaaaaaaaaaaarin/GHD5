@@ -118,6 +118,11 @@ const SEMESTRE = function(semestre: number): any[][] {
             datestr = `le ${jours[date.getDay()-1]} ${date.getDate()}`;
             heurestr = `à ${date.getHours()}h${date.getMinutes()==0?'':date.getMinutes()}`;
         }
+        if (data["date-time"]["date-time"]) {
+            date = new Date(data["date-time"]["date-time"]);
+            datestr = `le ${jours[date.getDay()-1]} ${date.getDate()}`;
+            heurestr = `à ${date.getHours()}h${date.getMinutes()==0?'':date.getMinutes()}`;
+        }
         switch (data.question) {
             
             case "premier-cours":
