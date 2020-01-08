@@ -64,10 +64,16 @@ export class icsToJson {
                     currentObj["end"]   = this.dateToArray(value);
                 } else if (entete == this.SUMMARY ) {
                     let [type, matière] = value.split('-').map(x => x.trim());
-                    currentObj["matière"] = matière.split("\\")[0];
-                    currentObj["type"] = <TypeCours><unknown>TypeCours[<any>type];
+                    currentObj.matière = matière.split("\\")[0];
+                    currentObj.type = type.toLowerCase();
+
                 } else if (entete == this.DESCRIPTION ) {
-                    let prof = element.split("\\")[1].split(":")[1].trim();
+                    let prof = "";
+                    try {
+                        prof = element.split("\\")[1].split(":")[1].trim();
+                    } catch {
+                    }
+                     
                     currentObj["prof"] = prof;
                 } else if (entete == this.LOCATION) {
                     currentObj["salle"] = String(value.replace("\\", "").replace(",", "").split(" "));

@@ -25,9 +25,9 @@ const credentials = {
 };
 
 const jours = [
-    "lundi","mardi","mercredi",
-    "jeudi","vendredi","samedi",
-    "dimanche"
+    "Lundi","Mardi","Mercredi",
+    "Jeudi","Vendredi","Samedi",
+    "Dimanche"
 ]
 
 const httpServer = http.createServer(app);
@@ -39,7 +39,7 @@ const returnMessage = {
         {
             "text": {
                 "text": [
-                    "lol :)"
+                    "La demande n'a pas pu être traitée"
                 ]
             }
         }
@@ -72,42 +72,6 @@ const SEMESTRE = function(semestre: number): any[][] {
 };
 
 
-let cas = [
-
-    // FORMAT:
-    //  [ 0, 1 ]
-    //  0 --> Elements nécessaires au déclenchement 
-    //  1 --> Groupe de déclenchement
-
-    // prochain() / preced(), a partir de demain
-    // Heure de début / fin d'une journée donnée
-    [{"commence_termine":true, "date":true, "groupe":true}, "commence_termine"],
-    
-    // prochain, a partir de date maintenant
-    // Prochain cours
-    [{"groupe":true, "prochain":true}, "prochain_cours"],
-
-    // prochain, a partir de date maintenant, check si cours = cours demandé
-    // Prochain cours d'une matière donnée
-    // -- SI: cours == null
-    //    ALORS chercher prochain créneau libre
-    [{"groupe":true, "prochain":true, "matière":true}, "prochain_cours"],
-
-    // Prochain cours avec professeur donné
-    [{"professeur":true, "groupe":true, "prochain":true}, "prochain_cours"],
-
-    // Prochain cours avec professeur donné dans une salle donnée
-    [{"professeur":true, "groupe":true, "prochain":true, "salle":true}, "prochain_cours"],
-
-
-    // Cas de test
-    [{"hello":true,"world":true}, "test"],
-
-    // Mettre à jour les emplois du temps manuellement
-    [{"màj":true, "mdp":true}, "mise_a_jour"]
-];
-
-
 (main = () : void => {
     
 
@@ -124,31 +88,12 @@ let cas = [
         EDTs.set(groupe.toString(), new EmploisDuTemps(groupe));
     });
 
-    function format(inobj: any): string {
-        let out: string = "";
-        Object.keys(inobj).forEach(e => {
-            out+=e+":"+inobj[e]+"\n";
-        })
-        return out;
+    function setReturn(str: string) {
+        returnMessage.fulfillmentMessages[0].text.text[0] = str;
     }
 
-    function checkFieldPresence(jsonobj: any): Array<Object> {
-
-        for (let element in jsonobj) {
-            jsonobj[element] = true;
-        }
-
-        let fjobj = format(jsonobj);
-
-        let target_action = cas.map(c => {
-            let f = format(c[0]);
-            return {"object":c, "present":fjobj==f, "formatted":f}; 
-        })
-        target_action = target_action.filter(c => {
-            return c.present;
-        })
-
-        return target_action;
+    function appendReturn(str: string) {
+        returnMessage.fulfillmentMessages[0].text.text[0] += str;
     }
 
     app.post('/webhook', (request, response) => {
@@ -157,31 +102,82 @@ let cas = [
 
         let data = request.body.queryResult.parameters;
 
-        console.log(request.body)
+        let edt: any             = "";
+        let date: Date           = new Date();
+        let datestr: string = "";
+        let heurestr: string = `à ${date.getHours()}h${date.getMinutes()==0?'':date.getMinutes()}`;
+        let returnString: string = "";
 
+        if (data.groupe) {
+            edt  = EDTs.get(data.groupe);
+            datestr = "aujourd'hui"
+        }
+            
+        if (data["date-time"] != "" && data["date-time"] != null) {
+            date = new Date(data["date-time"]);
+            datestr = `le ${jours[date.getDay()-1]} ${date.getDate()}`;
+            heurestr = `à ${date.getHours()}h${date.getMinutes()==0?'':date.getMinutes()}`;
+        }
         switch (data.question) {
+            
             case "premier-cours":
-                let edt: any = EDTs.get(data.groupe);
-                let date: Date = new Date();
-                if (data["date-time"] != "" && data["date-time"] != null) {
-                    date = new Date(data["date-time"]);
-                }
-
                 date.setHours(6);
                 date.setMinutes(0);
 
                 let coursSuivant = edt.getCoursSuivant(date);
-                let returnString: string = "";
-                returnString += `Vous commencez à ${coursSuivant.start[1][0]}h${coursSuivant.start[1][1]} le ${jours[date.getDay()-1]} ${date.getDate()}`;
-                returnMessage.fulfillmentMessages[0].text.text[0] = returnString;
+                returnString = `Vous commencez à ${coursSuivant.start[1][0]}h${coursSuivant.start[1][1]==0?'':coursSuivant.start[1][1]} ` + datestr;
+                
+                setReturn(returnString);
                 response.send(JSON.stringify(returnMessage));
-                //response.send(JSON.stringify(coursSuivant));
                 break;
             
+            case "fin-cours":
+                date.setHours(19);
+                date.setMinutes(0);
+
+                let coursPrecedent = edt.getCoursPrécédent(date);
+                returnString = `Vous terminez à ${coursPrecedent.end[1][0]}h${coursPrecedent.end[1][1]==0?'':coursPrecedent.end[1][1]} ` + datestr;
+
+                setReturn(returnString);
+                response.send(JSON.stringify(returnMessage));
+                break;
+
+            case "salle":
+            case "cours":
+                let coursActuel = edt.getCoursAt(date);
+                console.log(coursActuel)
+                returnString = `Vous n'avez pas cours ${datestr} ${heurestr}`;
+                if (Object.keys(coursActuel).length > 0) {
+                    returnString = `Vous avez ${coursActuel.type} de ${coursActuel.matière} en salle ${coursActuel.salle} ${datestr} ${heurestr}`;
+                }
+                setReturn(returnString);
+                response.send(JSON.stringify(returnMessage));
+                break;
+
+            //est-ce que j'ai un trou demain etc
+            case "trou":
+                break;
             
+            case "prochain-cours":
+                break;
+            case "prochain-matiere":
+                break;
+            case "prochain-exam":
+                 break;
+            case "prochain-salle":
+                break;
+            case "prochain-trou":
+                break;
+            case "prochain-prof":
+                break;
+            case "prochain-type":
+                break;
+
             default:
                 break;
         }
+
+        
     });
 
     httpServer.listen(http_port, () => {
