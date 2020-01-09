@@ -155,7 +155,8 @@ const SEMESTRE = function(semestre: number): any[][] {
                 console.log(coursActuel)
                 returnString = `Vous n'avez pas cours ${datestr} ${heurestr}`;
                 if (Object.keys(coursActuel).length > 0) {
-                    returnString = `Vous avez ${coursActuel.type} de ${coursActuel.matière} en salle ${coursActuel.salle} ${datestr} ${heurestr}`;
+                    returnString = `Vous avez ${coursActuel.type} de ${coursActuel.matière} en salle ${coursActuel.salle} ${datestr}`;
+                    returnString+= `à ${date.getHours()-1}h${date.getMinutes()==0?'':date.getMinutes()}`;
                 }
                 setReturn(returnString);
                 response.send(JSON.stringify(returnMessage));
