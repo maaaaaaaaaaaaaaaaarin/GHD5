@@ -34,7 +34,7 @@ const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 
 const returnMessage = {
-    "fulfillmentText":"response",
+    "fulfillmentText":"La demande n'a pas pu être traitée",
     "fulfillmentMessages":[
         {
             "text": {
@@ -90,10 +90,12 @@ const SEMESTRE = function(semestre: number): any[][] {
 
     function setReturn(str: string) {
         returnMessage.fulfillmentMessages[0].text.text[0] = str;
+        returnMessage.fulfillmentText = str;
     }
 
     function appendReturn(str: string) {
         returnMessage.fulfillmentMessages[0].text.text[0] += str;
+        returnMessage.fulfillmentText += str;
     }
 
     app.post('/webhook', (request, response) => {
