@@ -6,11 +6,13 @@ import {
     Groupe,
     Cours
 } from ".";
+import { json } from "express";
 
 export class EmploisDuTemps {
 
     private contenu    : Cours[] = [];
     static  forceUpdate: boolean = false;
+    static  savePath   : string  = "./backups/";
     static  baseURI    : string  =
     "https://edt.iut-tlse3.fr/planning/info/";
     static fext: any = {
@@ -51,7 +53,8 @@ export class EmploisDuTemps {
         let cbstr: string = "";
 
         if (!fs.existsSync(jsonfile) || EmploisDuTemps.forceUpdate) {
-            Logger.info(`Le fichier ${jsonfile} n'existe pas, création. (groupe: ${this.groupe})`);
+            if (!fs.existsSync(jsonfile)) Logger.info(`Le fichier ${jsonfile} n'existe pas, création. (groupe: ${this.groupe})`);
+            if (EmploisDuTemps.forceUpdate) Logger.info(`Mise à jour fichier groupe ${this.groupe})`);
             // The More You Know: URI signifie Uniform Resource Identifier;
             let targetURI: string = `${EmploisDuTemps.baseURI}${icsfile}`;
             request.get(targetURI, (err, res, body) => {
@@ -62,8 +65,24 @@ export class EmploisDuTemps {
                 let jsonStr: string  = JSON.stringify(converted.getJSON());
                 console.log(jsonStr)
                 fs.writeFileSync(__dirname + '/' + jsonfile, jsonStr);
+                this.contenu  = converted.getJSON();
             });
             
+            if (fs.existsSync(EmploisDuTemps.savePath)) {
+                let today = new Date();
+                let dirname = EmploisDuTemps.savePath+(today.getDate() + today.getMonth()+1 + today.getFullYear())+'/';
+                if (fs.existsSync(dirname)) {
+                    fs.rename(__dirname+'/'+jsonfile, dirname+jsonfile, function(err) {
+                        console.log('Backed up '+jsonfile+'!');
+                    });
+                } else {
+                    fs.mkdirSync(dirname);
+                    fs.rename(__dirname+'/'+jsonfile, dirname+jsonfile, function(err) {
+                        console.log('Backed up '+jsonfile+'!');
+                    });
+                }
+            }
+
             if (EmploisDuTemps.forceUpdate) cbstr="màj";
             if (!fs.existsSync(jsonfile)) cbstr="crt";
         }
