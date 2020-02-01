@@ -23,7 +23,7 @@
   "scripts": {
     "compile": "tsc --outDir ./generated",
     "test": "mocha -r ts-node/register test/*.ts",
-    "start": "sudo node compiled/main.js"
+    "start": "sudo ts-node main.ts"
   },
   "author": "",
   "license": "GPL-3.0-or-later",

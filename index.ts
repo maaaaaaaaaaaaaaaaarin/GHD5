@@ -1,5 +1,5 @@
-export {Groupe} from "./Groupe";
-export {Cours, TypeCours} from "./Cours";
-export {Logger} from "./Logger";
-export {EmploisDuTemps} from "./EmploisDuTemps";
-export {icsToJson} from "./icsToJson";
+export {Groupe} from "./classes/Groupe";
+export {Cours, TypeCours} from "./classes/Cours";
+export {Logger} from "./classes/Logger";
+export {EmploisDuTemps} from "./classes/EmploisDuTemps";
+export {icsToJson} from "./classes/icsToJson";
